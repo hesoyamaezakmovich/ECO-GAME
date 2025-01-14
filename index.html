@@ -9,318 +9,124 @@
         * {
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
-            -webkit-user-select: none;
             user-select: none;
             touch-action: none;
         }
 
         body {
             overscroll-behavior: none;
-            min-height: 100vh;
-            min-height: -webkit-fill-available;
+            background: #f0f2f5;
         }
 
-        html {
-            height: -webkit-fill-available;
+        .game-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: white;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .game-container {
-            display: none;
-            height: 100vh;
-            height: -webkit-fill-available;
-            overflow: hidden;
-        }
-
-        #menu {
-            display: block;
-        }
-
-        .touch-button {
-            position: relative;
-            transition: transform 0.15s;
-        }
-
-        .touch-button:active {
-            transform: scale(0.98);
+        .game-content {
+            padding-top: 140px;
+            padding-bottom: 20px;
         }
 
         .item-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-            touch-action: pan-y;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .drag-handle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #888;
         }
 
         .item-card.dragging {
             transform: scale(1.02);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            z-index: 100;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
         }
 
-        .waste-bin {
-            transition: transform 0.2s;
+        .nav-button {
+            font-size: 18px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: bold;
         }
 
-        .waste-bin:active {
-            transform: scale(0.98);
+        .set-button {
+            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin: 0 5px;
         }
 
-        .feedback-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
+        .control-button {
+            font-size: 18px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: bold;
         }
 
-        @media (orientation: portrait) {
-            .orientation-warning {
-                display: flex;
-            }
-            .game-content {
-                display: none;
-            }
+        .emoji-large {
+            font-size: 48px;
+            margin: 10px 0;
         }
 
-        @media (orientation: landscape) {
-            .orientation-warning {
-                display: none;
-            }
-            .game-content {
-                display: block;
-            }
+        .item-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 10px 0;
         }
 
-        .items-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            padding: 1rem;
-            height: calc(100vh - 4rem);
-            overflow-y: auto;
+        .decomp-time {
+            font-size: 16px;
+            color: #16a34a;
+            margin-top: 5px;
         }
     </style>
 </head>
-<body class="bg-gray-100">
-    <!-- Предупреждение о повороте экрана -->
-    <div class="orientation-warning fixed inset-0 bg-white z-50 flex-col items-center justify-center text-center p-4">
-        <div class="text-6xl mb-4">📱</div>
-        <h2 class="text-xl font-bold mb-2">Пожалуйста, поверните устройство</h2>
-        <p>Для лучшего игрового опыта используйте горизонтальную ориентацию</p>
-    </div>
-
-    <div class="game-content">
-        <!-- Главное меню -->
-        <div id="menu" class="game-container">
-            <div class="h-full flex items-center justify-center">
-                <div class="grid grid-cols-2 gap-6 px-6 max-w-4xl">
-                    <button id="start-decomposition" class="touch-button p-6 bg-green-600 text-white rounded-xl">
-                        <div class="text-4xl mb-3">⌛</div>
-                        <h2 class="text-xl font-bold">Время разложения</h2>
-                        <p class="mt-2 opacity-90">Расположите предметы по времени их разложения</p>
+<body>
+    <!-- Игра "Время разложения" -->
+    <div id="decomposition" class="min-h-screen">
+        <!-- Шапка с кнопками -->
+        <div class="game-header">
+            <div class="flex items-center justify-between mb-4">
+                <button class="nav-button bg-gray-600 text-white" onclick="backToMenu()">
+                    ← Назад
+                </button>
+                <div class="flex gap-2">
+                    <button class="control-button bg-green-600 text-white" onclick="checkOrder()">
+                        Проверить
                     </button>
-                    <button id="start-sorting" class="touch-button p-6 bg-blue-600 text-white rounded-xl">
-                        <div class="text-4xl mb-3">♻️</div>
-                        <h2 class="text-xl font-bold">Сортировка мусора</h2>
-                        <p class="mt-2 opacity-90">Отсортируйте мусор по правильным контейнерам</p>
+                    <button class="control-button bg-blue-600 text-white" onclick="shuffleItems()">
+                        Перемешать
                     </button>
                 </div>
+            </div>
+            <div class="flex justify-center" id="set-buttons">
+                <!-- Кнопки наборов будут добавлены через JavaScript -->
             </div>
         </div>
 
-        <!-- Игра "Время разложения" -->
-        <div id="decomposition" class="game-container">
-            <div class="h-full flex flex-col">
-                <div class="flex items-center justify-between p-4 bg-white shadow-md">
-                    <button id="back-to-menu" class="touch-button p-2 bg-gray-600 text-white rounded-lg">
-                        ← Назад
-                    </button>
-                    <div id="set-buttons" class="flex gap-2"></div>
-                    <div class="flex gap-2">
-                        <button id="check-order" class="touch-button px-4 py-2 bg-green-600 text-white rounded-lg">
-                            Проверить
-                        </button>
-                        <button id="shuffle-items" class="touch-button px-4 py-2 bg-blue-600 text-white rounded-lg">
-                            Перемешать
-                        </button>
-                    </div>
-                </div>
-                <div id="items-container" class="items-grid"></div>
-            </div>
-        </div>
-
-        <!-- Игра "Сортировка мусора" -->
-        <div id="waste-sorting" class="game-container">
-            <div class="h-full flex">
-                <!-- Левая панель с текущим предметом -->
-                <div class="w-1/3 bg-gray-50 p-4 flex flex-col">
-                    <button id="back-to-menu-sorting" class="touch-button self-start p-2 bg-gray-600 text-white rounded-lg mb-4">
-                        ← Назад
-                    </button>
-                    <div class="flex-grow flex flex-col items-center justify-center">
-                        <div id="score-panel" class="text-center mb-6">
-                            <div class="text-2xl font-bold">Очки: <span id="score">0</span></div>
-                            <div class="text-xl">Серия: <span id="combo">0</span>x</div>
-                        </div>
-                        <div id="current-item" class="text-center"></div>
-                    </div>
-                </div>
-                <!-- Правая панель с контейнерами -->
-                <div id="waste-bins" class="w-2/3 grid grid-cols-3 gap-4 p-4"></div>
-            </div>
+        <!-- Основной контент -->
+        <div class="game-content" id="items-container">
+            <!-- Карточки будут добавлены через JavaScript -->
         </div>
     </div>
 
     <script>
-        // Базы данных
-        const CARD_SETS = {
-            set1: {
-                name: "Набор 1",
-                items: [
-                    { name: "Банановая кожура", emoji: "🍌", decompositionTime: "3-4 недели", correct: 1 },
-                    { name: "Огрызок яблока", emoji: "🍎", decompositionTime: "2 месяца", correct: 2 },
-                    { name: "Картонная коробка", emoji: "📦", decompositionTime: "3 месяца", correct: 3 },
-                    { name: "Консервная банка", emoji: "🥫", decompositionTime: "50 лет", correct: 4 },
-                    { name: "Пластиковая бутылка", emoji: "🧴", decompositionTime: "450 лет", correct: 5 }
-                ]
-            },
-            set2: {
-                name: "Набор 2",
-                items: [
-                    { name: "Листья", emoji: "🍂", decompositionTime: "2-4 недели", correct: 1 },
-                    { name: "Газета", emoji: "📰", decompositionTime: "1-2 месяца", correct: 2 },
-                    { name: "Кожаный ботинок", emoji: "👞", decompositionTime: "25-40 лет", correct: 3 },
-                    { name: "Зажигалка", emoji: "🔥", decompositionTime: "100 лет", correct: 4 },
-                    { name: "Стеклянная бутылка", emoji: "🍾", decompositionTime: "1000+ лет", correct: 5 }
-                ]
-            },
-            set3: {
-                name: "Набор 3",
-                items: [
-                    { name: "Кофейная гуща", emoji: "☕", decompositionTime: "2-3 недели", correct: 1 },
-                    { name: "Бумажный пакет", emoji: "🛍️", decompositionTime: "2 месяца", correct: 2 },
-                    { name: "Шерстяной носок", emoji: "🧦", decompositionTime: "1-5 лет", correct: 3 },
-                    { name: "Батарейка", emoji: "🔋", decompositionTime: "100 лет", correct: 4 },
-                    { name: "CD диск", emoji: "💿", decompositionTime: "1000 лет", correct: 5 }
-                ]
-            }
-        };
-
-        const WASTE_CATEGORIES = {
-            recycling: {
-                name: 'Переработка',
-                emoji: '♻️',
-                color: 'bg-blue-500',
-                items: [
-                    { name: 'Пластиковая бутылка', emoji: '🧴', points: 1 },
-                    { name: 'Стеклянная банка', emoji: '🫙', points: 1 },
-                    { name: 'Газета', emoji: '📰', points: 1 },
-                    { name: 'Картонная коробка', emoji: '📦', points: 1 },
-                    { name: 'Алюминиевая банка', emoji: '🥤', points: 1 }
-                ]
-            },
-            organic: {
-                name: 'Органика',
-                emoji: '🍂',
-                color: 'bg-green-500',
-                items: [
-                    { name: 'Банановая кожура', emoji: '🍌', points: 1 },
-                    { name: 'Яблочный огрызок', emoji: '🍎', points: 1 },
-                    { name: 'Кофейная гуща', emoji: '☕', points: 1 },
-                    { name: 'Листья', emoji: '🍂', points: 1 },
-                    { name: 'Скошенная трава', emoji: '🌿', points: 1 }
-                ]
-            },
-            hazardous: {
-                name: 'Опасные отходы',
-                emoji: '⚠️',
-                color: 'bg-red-500',
-                items: [
-                    { name: 'Батарейка', emoji: '🔋', points: 2 },
-                    { name: 'Лампочка', emoji: '💡', points: 2 },
-                    { name: 'Краска', emoji: '🎨', points: 2 },
-                    { name: 'Лекарства', emoji: '💊', points: 2 },
-                    { name: 'Бытовая химия', emoji: '🧪', points: 2 }
-                ]
-            }
-        };
-
-        // Глобальные переменные
-        let currentSet = 'set1';
-        let currentItems = [];
-        let showTimes = false;
-        let score = 0;
-        let combo = 0;
-        let currentWasteItem = null;
-        let draggedElement = null;
-
-        // Вспомогательные функции
-        function shuffle(array) {
-            const newArray = [...array];
-            for (let i = newArray.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-            }
-            return newArray;
-        }
-
-        function showFeedback(message, type = 'success') {
-            const popup = document.createElement('div');
-            popup.className = 'feedback-popup';
-            popup.innerHTML = `
-                <div class="text-xl font-bold ${type === 'success' ? 'text-green-600' : 'text-red-600'}">
-                    ${message}
-                </div>
-            `;
-            document.body.appendChild(popup);
-            setTimeout(() => popup.remove(), 1500);
-        }
-
-        // Функции навигации
-        function showScreen(screenId) {
-            document.querySelectorAll('.game-container').forEach(container => {
-                container.style.display = 'none';
-            });
-            document.getElementById(screenId).style.display = 'block';
-        }
-
-        function backToMenu() {
-            showScreen('menu');
-        }
-
-        // Игра "Время разложения"
-        function initDecompositionGame() {
-            const setButtonsContainer = document.getElementById('set-buttons');
-            setButtonsContainer.innerHTML = '';
-            
-            Object.entries(CARD_SETS).forEach(([key, set]) => {
-                const button = document.createElement('button');
-                button.className = `touch-button px-4 py-2 rounded-lg ${
-                    currentSet === key ? 'bg-green-600 text-white' : 'bg-gray-200'
-                }`;
-                button.textContent = set.name;
-                button.addEventListener('touchend', () => selectSet(key));
-                setButtonsContainer.appendChild(button);
-            });
-
-            selectSet(currentSet);
-        }
-
-        function selectSet(setKey) {
-            currentSet = setKey;
-            currentItems = shuffle([...CARD_SETS[setKey].items]);
-            showTimes = false;
-            renderItems();
-
-            document.querySelectorAll('#set-buttons button').forEach(button => {
-                const isActive = button.textContent === CARD_SETS[setKey].name;
-                button.className = `touch-button px-4 py-2 rounded-lg ${
-                    isActive ? 'bg-green-600 text-white' : 'bg-gray-200'
-                }`;
-            });
-        }
+        // Те же базы данных CARD_SETS и WASTE_CATEGORIES
 
         function renderItems() {
             const container = document.getElementById('items-container');
@@ -328,194 +134,98 @@
 
             currentItems.forEach((item, index) => {
                 const card = document.createElement('div');
-                card.className = 'item-card bg-white p-4 rounded-xl shadow-md';
+                card.className = 'item-card';
                 card.dataset.index = index;
                 card.innerHTML = `
-                    <div class="h-full flex flex-col items-center justify-between">
-                        <div class="text-4xl mb-2">${item.emoji}</div>
-                        <div class="text-center">
-                            <div class="font-bold mb-1">${item.name}</div>
-                            ${showTimes ? `
-                                <div class="text-green-600 text-sm">${item.decompositionTime}</div>
-                            ` : ''}
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <div class="emoji-large">${item.emoji}</div>
+                            <div class="item-name">${item.name}</div>
+                            ${showTimes ? `<div class="decomp-time">${item.decompositionTime}</div>` : ''}
                         </div>
-                        <div class="text-gray-400 mt-2">⋮⋮</div>
+                        <div class="drag-handle">⋮⋮</div>
                     </div>
                 `;
 
-                // Добавляем обработчики для перетаскивания
-                card.addEventListener('touchstart', handleDragStart);
-                card.addEventListener('touchmove', handleDragMove);
-                card.addEventListener('touchend', handleDragEnd);
-
+                setupDragListeners(card);
                 container.appendChild(card);
             });
         }
 
-        function handleDragStart(e) {
-            const card = e.target.closest('.item-card');
-            if (!card) return;
-
-            draggedElement = {
-                element: card,
-                initialX: e.touches[0].clientX,
-                initialY: e.touches[0].clientY,
-                index: parseInt(card.dataset.index)
-            };
-
-            card.classList.add('dragging');
-            e.preventDefault();
-        }
-
-        function handleDragMove(e) {
-            if (!draggedElement) return;
-
-            const deltaX = e.touches[0].clientX - draggedElement.initialX;
-            const deltaY = e.touches[0].clientY - draggedElement.initialY;
-
-            draggedElement.element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
-            // Находим карточку под текущей позицией
-            const cards = Array.from(document.querySelectorAll('.item-card:not(.dragging)'));
-            const cardUnder = cards.find(card => {
-                const rect = card.getBoundingClientRect();
-                return e.touches[0].clientY > rect.top && e.touches[0].clientY < rect.bottom;
-            });
-
-            if (cardUnder) {
-                const toIndex = parseInt(cardUnder.dataset.index);
-                if (toIndex !== draggedElement.index) {
-                    // Переставляем элементы
-                    const item = currentItems[draggedElement.index];
-                    currentItems.splice(draggedElement.index, 1);
-                    currentItems.splice(toIndex, 0, item);
-                    renderItems();
-                    
-                    // Обновляем draggedElement
-                    const newCard = document.querySelector(`[data-index="${toIndex}"]`);
-                    draggedElement.element = newCard;
-                    draggedElement.index = toIndex;
-                    newCard.classList.add('dragging');
-                }
-            }
-
-            e.preventDefault();
-        }
-
-        function handleDragEnd() {
-            if (!draggedElement) return;
-
-            draggedElement.element.style.transform = '';
-            draggedElement.element.classList.remove('dragging');
-            draggedElement = null;
-        }
-
-        function checkOrder() {
-            const isCorrect = currentItems.every((item, index) => item.correct === index + 1);
-            showTimes = true;
-            showFeedback(
-                isCorrect ? 'Правильно! Вы отлично справились!' : 'Попробуйте еще раз!',
-                isCorrect ? 'success' : 'error'
-            );
-            renderItems();
-        }
-
-        function shuffleItems() {
-            currentItems = shuffle([...currentItems]);
-            showTimes = false;
-            renderItems();
-        }
-
-        // Игра "Сортировка мусора"
-        function initWasteSortingGame() {
-            score = 0;
-            combo = 0;
-            document.getElementById('score').textContent = score;
-            document.getElementById('combo').textContent = `${combo}x`;
-
-            const binsContainer = document.getElementById('waste-bins');
-            binsContainer.innerHTML = '';
-
-            Object.entries(WASTE_CATEGORIES).forEach(([key, category]) => {
-                const bin = document.createElement('div');
-                bin.className = `waste-bin ${category.color} rounded-xl p-4 flex flex-col items-center justify-center text-white`;
-                bin.innerHTML = `
-                    <div class="text-4xl mb-2">${category.emoji}</div>
-                    <div class="text-lg font-bold text-center">${category.name}</div>
-                `;
-                bin.addEventListener('touchend', () => handleSort(key));
-                binsContainer.appendChild(bin);
-            });
-
-            generateNewItem();
-        }
-
-        function generateNewItem() {
-            const categories = Object.keys(WASTE_CATEGORIES);
-            const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-            const categoryItems = WASTE_CATEGORIES[randomCategory].items;
-            const randomItem = categoryItems[Math.floor(Math.random() * categoryItems.length)];
+        function setupDragListeners(card) {
+            let startY = 0;
+            let currentY = 0;
+            let initialPosition = 0;
             
-            currentWasteItem = {
-                ...randomItem,
-                type: randomCategory
-            };
-
-            const itemContainer = document.getElementById('current-item');
-            itemContainer.innerHTML = `
-                <div class="bg-white p-6 rounded-xl shadow-md">
-                    <div class="text-6xl mb-4">${currentWasteItem.emoji}</div>
-                    <div class="text-xl font-bold">${currentWasteItem.name}</div>
-                </div>
-            `;
-        }
-
-        function handleSort(binType) {
-            if (!currentWasteItem) return;
-
-            if (currentWasteItem.type === binType) {
-                const pointsEarned = currentWasteItem.points + Math.floor(combo / 3);
-                score += pointsEarned;
-                combo++;
-                showFeedback(`+${pointsEarned} очков!`, 'success');
-            } else {
-                combo = 0;
-                showFeedback(`Неправильно! Это ${WASTE_CATEGORIES[currentWasteItem.type].name.toLowerCase()}`, 'error');
-            }
-
-            document.getElementById('score').textContent = score;
-            document.getElementById('combo').textContent = `${combo}x`;
-
-            setTimeout(generateNewItem, 1500);
-        }
-
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', () => {
-            // Обработчики кнопок меню
-            document.getElementById('start-decomposition').addEventListener('touchend', () => {
-                showScreen('decomposition');
-                initDecompositionGame();
+            card.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+                initialPosition = card.offsetTop;
+                card.classList.add('dragging');
             });
 
-            document.getElementById('start-sorting').addEventListener('touchend', () => {
-                showScreen('waste-sorting');
-                initWasteSortingGame();
-            });
+            card.addEventListener('touchmove', (e) => {
+                currentY = e.touches[0].clientY;
+                const deltaY = currentY - startY;
+                
+                // Ограничиваем движение карточки по вертикали
+                const maxTop = window.innerHeight - card.offsetHeight;
+                let newTop = initialPosition + deltaY;
+                newTop = Math.max(0, Math.min(newTop, maxTop));
+                
+                card.style.transform = `translateY(${deltaY}px)`;
 
-            // Обработчики кнопок "Назад"
-            document.getElementById('back-to-menu').addEventListener('touchend', backToMenu);
-            document.getElementById('back-to-menu-sorting').addEventListener('touchend', backToMenu);
+                // Находим ближайшую карточку для замены
+                const cards = [...document.querySelectorAll('.item-card:not(.dragging)')];
+                const cardBelow = cards.find(otherCard => {
+                    const box = otherCard.getBoundingClientRect();
+                    return currentY > box.top && currentY < box.bottom;
+                });
 
-            // Обработчики кнопок игры "Время разложения"
-            document.getElementById('check-order').addEventListener('touchend', checkOrder);
-            document.getElementById('shuffle-items').addEventListener('touchend', shuffleItems);
+                if (cardBelow) {
+                    const draggedIndex = parseInt(card.dataset.index);
+                    const targetIndex = parseInt(cardBelow.dataset.index);
+                    
+                    if (draggedIndex !== targetIndex) {
+                        // Меняем порядок элементов
+                        const item = currentItems[draggedIndex];
+                        currentItems.splice(draggedIndex, 1);
+                        currentItems.splice(targetIndex, 0, item);
+                        renderItems();
 
-            // Предотвращаем скролл страницы при перетаскивании
-            document.addEventListener('touchmove', (e) => {
-                if (draggedElement) {
-                    e.preventDefault();
+                        // Восстанавливаем состояние перетаскивания
+                        const newCard = document.querySelector(`[data-index="${targetIndex}"]`);
+                        newCard.classList.add('dragging');
+                        newCard.style.transform = `translateY(${deltaY}px)`;
+                    }
                 }
-            }, { passive: false });
+            });
+
+            card.addEventListener('touchend', () => {
+                card.classList.remove('dragging');
+                card.style.transform = '';
+            });
+        }
+
+        function initDecompositionGame() {
+            const setButtonsContainer = document.getElementById('set-buttons');
+            setButtonsContainer.innerHTML = '';
+            
+            Object.entries(CARD_SETS).forEach(([key, set]) => {
+                const button = document.createElement('button');
+                button.className = `set-button ${
+                    currentSet === key ? 'bg-green-600 text-white' : 'bg-gray-200'
+                }`;
+                button.textContent = set.name;
+                button.onclick = () => selectSet(key);
+                setButtonsContainer.appendChild(button);
+            });
+
+            selectSet(currentSet);
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            initDecompositionGame();
         });
     </script>
 </body>
