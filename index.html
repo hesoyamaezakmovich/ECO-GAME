@@ -2,7 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Эко-игры</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
@@ -13,9 +16,28 @@
             touch-action: none;
         }
 
-        body {
-            overscroll-behavior: none;
-            background: #f0f2f5;
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            background-color: #f0f2f5;
+        }
+
+        .game-container {
+            display: none;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        #menu {
+            display: block;
         }
 
         .game-header {
@@ -25,108 +47,325 @@
             right: 0;
             z-index: 100;
             background: white;
-            padding: 10px;
+            padding: env(safe-area-inset-top) 16px 16px 16px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .game-content {
-            padding-top: 140px;
-            padding-bottom: 20px;
         }
 
         .item-card {
             background: white;
             border-radius: 16px;
-            padding: 20px;
-            margin: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        .drag-handle {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 24px;
-            color: #888;
+            margin: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transform: translateZ(0);
+            will-change: transform;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .item-card.dragging {
-            transform: scale(1.02);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            transform: scale(1.02) translateZ(0);
         }
 
-        .nav-button {
-            font-size: 18px;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: bold;
+        .card-content {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 100px;
         }
 
-        .set-button {
-            font-size: 16px;
-            padding: 10px 20px;
-            border-radius: 10px;
-            margin: 0 5px;
+        .item-emoji {
+            font-size: 40px;
+            margin-right: 16px;
         }
 
-        .control-button {
-            font-size: 18px;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: bold;
-        }
-
-        .emoji-large {
-            font-size: 48px;
-            margin: 10px 0;
+        .item-info {
+            flex: 1;
         }
 
         .item-name {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            margin: 10px 0;
+            margin-bottom: 4px;
         }
 
         .decomp-time {
-            font-size: 16px;
             color: #16a34a;
-            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        .drag-handle {
+            color: #9ca3af;
+            font-size: 24px;
+            padding: 0 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.1s ease;
+            touch-action: manipulation;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .set-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+        .waste-bin {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 12px;
+            text-align: center;
+            transition: transform 0.1s ease;
+        }
+
+        .waste-bin:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
 <body>
+    <div id="fullscreen-button" class="fixed top-4 right-4 z-50 bg-blue-600 text-white p-2 rounded-lg">
+        На весь экран
+    </div>
+
+    <!-- Главное меню -->
+    <div id="menu" class="game-container">
+        <div class="max-w-lg mx-auto p-4 mt-16">
+            <h1 class="text-3xl font-bold text-center text-green-600 mb-8">Эко-игры</h1>
+            <div class="space-y-4">
+                <button id="start-decomposition" class="w-full btn bg-green-600 text-white text-left">
+                    <div class="text-2xl mb-2">⌛️ Время разложения</div>
+                    <div class="text-sm opacity-90">Расположите предметы по времени их разложения</div>
+                </button>
+                <button id="start-sorting" class="w-full btn bg-blue-600 text-white text-left">
+                    <div class="text-2xl mb-2">♻️ Сортировка мусора</div>
+                    <div class="text-sm opacity-90">Отсортируйте мусор по правильным контейнерам</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Игра "Время разложения" -->
-    <div id="decomposition" class="min-h-screen">
-        <!-- Шапка с кнопками -->
+    <div id="decomposition" class="game-container">
         <div class="game-header">
             <div class="flex items-center justify-between mb-4">
-                <button class="nav-button bg-gray-600 text-white" onclick="backToMenu()">
+                <button class="btn bg-gray-600 text-white" onclick="backToMenu()">
                     ← Назад
                 </button>
                 <div class="flex gap-2">
-                    <button class="control-button bg-green-600 text-white" onclick="checkOrder()">
+                    <button class="btn bg-green-600 text-white" onclick="checkOrder()">
                         Проверить
                     </button>
-                    <button class="control-button bg-blue-600 text-white" onclick="shuffleItems()">
+                    <button class="btn bg-blue-600 text-white" onclick="shuffleItems()">
                         Перемешать
                     </button>
                 </div>
             </div>
-            <div class="flex justify-center" id="set-buttons">
-                <!-- Кнопки наборов будут добавлены через JavaScript -->
+            <div class="flex justify-center gap-2 overflow-x-auto py-2" id="set-buttons"></div>
+        </div>
+
+        <div class="pb-4 pt-32" id="items-container"></div>
+    </div>
+
+    <!-- Игра "Сортировка мусора" -->
+    <div id="waste-sorting" class="game-container">
+        <div class="game-header">
+            <div class="flex items-center justify-between mb-4">
+                <button class="btn bg-gray-600 text-white" onclick="backToMenu()">
+                    ← Назад
+                </button>
+                <div class="flex items-center gap-4">
+                    <div class="text-xl font-bold">Очки: <span id="score">0</span></div>
+                    <div class="text-xl">×<span id="combo">0</span></div>
+                </div>
             </div>
         </div>
 
-        <!-- Основной контент -->
-        <div class="game-content" id="items-container">
-            <!-- Карточки будут добавлены через JavaScript -->
+        <div class="pt-32 pb-4">
+            <div id="current-item" class="text-center mb-8"></div>
+            <div id="waste-bins" class="grid grid-cols-1 gap-4 max-w-lg mx-auto"></div>
         </div>
     </div>
 
     <script>
-        // Те же базы данных CARD_SETS и WASTE_CATEGORIES
+        // Базы данных
+        const CARD_SETS = {
+            set1: {
+                name: "Набор 1",
+                items: [
+                    { name: "Банановая кожура", emoji: "🍌", decompositionTime: "3-4 недели", correct: 1 },
+                    { name: "Огрызок яблока", emoji: "🍎", decompositionTime: "2 месяца", correct: 2 },
+                    { name: "Картонная коробка", emoji: "📦", decompositionTime: "3 месяца", correct: 3 },
+                    { name: "Консервная банка", emoji: "🥫", decompositionTime: "50 лет", correct: 4 },
+                    { name: "Пластиковая бутылка", emoji: "🧴", decompositionTime: "450 лет", correct: 5 }
+                ]
+            },
+            set2: {
+                name: "Набор 2",
+                items: [
+                    { name: "Листья", emoji: "🍂", decompositionTime: "2-4 недели", correct: 1 },
+                    { name: "Газета", emoji: "📰", decompositionTime: "1-2 месяца", correct: 2 },
+                    { name: "Кожаный ботинок", emoji: "👞", decompositionTime: "25-40 лет", correct: 3 },
+                    { name: "Зажигалка", emoji: "🔥", decompositionTime: "100 лет", correct: 4 },
+                    { name: "Стеклянная бутылка", emoji: "🍾", decompositionTime: "1000+ лет", correct: 5 }
+                ]
+            },
+            set3: {
+                name: "Набор 3",
+                items: [
+                    { name: "Кофейная гуща", emoji: "☕", decompositionTime: "2-3 недели", correct: 1 },
+                    { name: "Бумажный пакет", emoji: "🛍️", decompositionTime: "2 месяца", correct: 2 },
+                    { name: "Шерстяной носок", emoji: "🧦", decompositionTime: "1-5 лет", correct: 3 },
+                    { name: "Батарейка", emoji: "🔋", decompositionTime: "100 лет", correct: 4 },
+                    { name: "CD диск", emoji: "💿", decompositionTime: "1000 лет", correct: 5 }
+                ]
+            }
+        };
+
+        const WASTE_CATEGORIES = {
+            recycling: {
+                name: 'Переработка',
+                emoji: '♻️',
+                color: 'bg-blue-500',
+                items: [
+                    { name: 'Пластиковая бутылка', emoji: '🧴', points: 1 },
+                    { name: 'Стеклянная банка', emoji: '🫙', points: 1 },
+                    { name: 'Газета', emoji: '📰', points: 1 },
+                    { name: 'Картонная коробка', emoji: '📦', points: 1 },
+                    { name: 'Алюминиевая банка', emoji: '🥤', points: 1 }
+                ]
+            },
+            organic: {
+                name: 'Органика',
+                emoji: '🍂',
+                color: 'bg-green-500',
+                items: [
+                    { name: 'Банановая кожура', emoji: '🍌', points: 1 },
+                    { name: 'Яблочный огрызок', emoji: '🍎', points: 1 },
+                    { name: 'Кофейная гуща', emoji: '☕', points: 1 },
+                    { name: 'Листья', emoji: '🍂', points: 1 },
+                    { name: 'Скошенная трава', emoji: '🌿', points: 1 }
+                ]
+            },
+            hazardous: {
+                name: 'Опасные отходы',
+                emoji: '⚠️',
+                color: 'bg-red-500',
+                items: [
+                    { name: 'Батарейка', emoji: '🔋', points: 2 },
+                    { name: 'Лампочка', emoji: '💡', points: 2 },
+                    { name: 'Краска', emoji: '🎨', points: 2 },
+                    { name: 'Лекарства', emoji: '💊', points: 2 },
+                    { name: 'Бытовая химия', emoji: '🧪', points: 2 }
+                ]
+            }
+        };
+
+        // Глобальные переменные
+        let currentSet = 'set1';
+        let currentItems = [];
+        let showTimes = false;
+        let score = 0;
+        let combo = 0;
+        let currentWasteItem = null;
+        let draggedElement = null;
+        let touchStartY = 0;
+        let initialScrollTop = 0;
+
+        // Функции управления экраном
+        function toggleFullScreen() {
+            if (!document.fullscreenElement && 
+                !document.mozFullScreenElement && 
+                !document.webkitFullscreenElement && 
+                !document.msFullscreenElement) {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.mozRequestFullScreen) {
+                    document.documentElement.mozRequestFullScreen();
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.msRequestFullscreen) {
+                    document.documentElement.msRequestFullscreen();
+                }
+            }
+        }
+
+        // Вспомогательные функции
+        function shuffle(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function showFeedback(message, type = 'success') {
+            const existingFeedback = document.querySelector('.feedback-popup');
+            if (existingFeedback) {
+                existingFeedback.remove();
+            }
+
+            const popup = document.createElement('div');
+            popup.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ' +
+                            'bg-white rounded-xl shadow-lg p-6 z-50 text-center';
+            popup.innerHTML = `
+                <div class="text-xl font-bold ${type === 'success' ? 'text-green-600' : 'text-red-600'}">
+                    ${message}
+                </div>
+            `;
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 1500);
+        }
+        function showScreen(screenId) {
+            document.querySelectorAll('.game-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            document.getElementById(screenId).style.display = 'block';
+        }
+
+        function backToMenu() {
+            showScreen('menu');
+        }
+
+        function initDecompositionGame() {
+            const setButtonsContainer = document.getElementById('set-buttons');
+            setButtonsContainer.innerHTML = '';
+            
+            Object.entries(CARD_SETS).forEach(([key, set]) => {
+                const button = document.createElement('button');
+                button.className = `set-button ${currentSet === key ? 'bg-green-600 text-white' : 'bg-gray-200'}`;
+                button.textContent = set.name;
+                button.addEventListener('touchend', () => selectSet(key));
+                setButtonsContainer.appendChild(button);
+            });
+
+            selectSet(currentSet);
+        }
+
+        function selectSet(setKey) {
+            currentSet = setKey;
+            currentItems = shuffle([...CARD_SETS[setKey].items]);
+            showTimes = false;
+            renderItems();
+
+            document.querySelectorAll('#set-buttons button').forEach(button => {
+                button.className = `set-button px-4 py-2 rounded-lg ${
+                    button.textContent === CARD_SETS[setKey].name ? 'bg-green-600 text-white' : 'bg-gray-200'
+                }`;
+            });
+        }
 
         function renderItems() {
             const container = document.getElementById('items-container');
@@ -137,13 +376,15 @@
                 card.className = 'item-card';
                 card.dataset.index = index;
                 card.innerHTML = `
-                    <div class="flex items-center">
-                        <div class="flex-1">
-                            <div class="emoji-large">${item.emoji}</div>
-                            <div class="item-name">${item.name}</div>
-                            ${showTimes ? `<div class="decomp-time">${item.decompositionTime}</div>` : ''}
+                    <div class="flex items-center p-6">
+                        <div class="text-4xl mr-4">${item.emoji}</div>
+                        <div class="flex-grow">
+                            <div class="text-xl font-bold">${item.name}</div>
+                            ${showTimes ? `
+                                <div class="text-green-600 mt-1">${item.decompositionTime}</div>
+                            ` : ''}
                         </div>
-                        <div class="drag-handle">⋮⋮</div>
+                        <div class="text-gray-400 text-2xl">⋮⋮</div>
                     </div>
                 `;
 
@@ -154,31 +395,27 @@
 
         function setupDragListeners(card) {
             let startY = 0;
-            let currentY = 0;
             let initialPosition = 0;
             
             card.addEventListener('touchstart', (e) => {
+                e.preventDefault();
                 startY = e.touches[0].clientY;
                 initialPosition = card.offsetTop;
                 card.classList.add('dragging');
             });
 
             card.addEventListener('touchmove', (e) => {
-                currentY = e.touches[0].clientY;
-                const deltaY = currentY - startY;
+                if (!card.classList.contains('dragging')) return;
                 
-                // Ограничиваем движение карточки по вертикали
-                const maxTop = window.innerHeight - card.offsetHeight;
-                let newTop = initialPosition + deltaY;
-                newTop = Math.max(0, Math.min(newTop, maxTop));
+                const currentY = e.touches[0].clientY;
+                const deltaY = currentY - startY;
                 
                 card.style.transform = `translateY(${deltaY}px)`;
 
-                // Находим ближайшую карточку для замены
                 const cards = [...document.querySelectorAll('.item-card:not(.dragging)')];
                 const cardBelow = cards.find(otherCard => {
                     const box = otherCard.getBoundingClientRect();
-                    return currentY > box.top && currentY < box.bottom;
+                    return currentY >= box.top && currentY <= box.bottom;
                 });
 
                 if (cardBelow) {
@@ -186,16 +423,13 @@
                     const targetIndex = parseInt(cardBelow.dataset.index);
                     
                     if (draggedIndex !== targetIndex) {
-                        // Меняем порядок элементов
                         const item = currentItems[draggedIndex];
                         currentItems.splice(draggedIndex, 1);
                         currentItems.splice(targetIndex, 0, item);
                         renderItems();
-
-                        // Восстанавливаем состояние перетаскивания
+                        
                         const newCard = document.querySelector(`[data-index="${targetIndex}"]`);
                         newCard.classList.add('dragging');
-                        newCard.style.transform = `translateY(${deltaY}px)`;
                     }
                 }
             });
@@ -204,28 +438,126 @@
                 card.classList.remove('dragging');
                 card.style.transform = '';
             });
+
+            card.addEventListener('touchcancel', () => {
+                card.classList.remove('dragging');
+                card.style.transform = '';
+            });
         }
 
-        function initDecompositionGame() {
-            const setButtonsContainer = document.getElementById('set-buttons');
-            setButtonsContainer.innerHTML = '';
+        function checkOrder() {
+            const isCorrect = currentItems.every((item, index) => item.correct === index + 1);
+            showTimes = true;
+            showFeedback(
+                isCorrect ? 'Правильно! Вы отлично справились!' : 'Попробуйте еще раз!',
+                isCorrect ? 'success' : 'error'
+            );
+            renderItems();
+        }
+
+        function shuffleItems() {
+            currentItems = shuffle([...currentItems]);
+            showTimes = false;
+            renderItems();
+        }
+
+        function initWasteSortingGame() {
+            score = 0;
+            combo = 0;
+            document.getElementById('score').textContent = score;
+            document.getElementById('combo').textContent = `${combo}x`;
             
-            Object.entries(CARD_SETS).forEach(([key, set]) => {
-                const button = document.createElement('button');
-                button.className = `set-button ${
-                    currentSet === key ? 'bg-green-600 text-white' : 'bg-gray-200'
-                }`;
-                button.textContent = set.name;
-                button.onclick = () => selectSet(key);
-                setButtonsContainer.appendChild(button);
+            const binsContainer = document.getElementById('waste-bins');
+            binsContainer.innerHTML = '';
+
+            Object.entries(WASTE_CATEGORIES).forEach(([key, category]) => {
+                const bin = document.createElement('div');
+                bin.className = `waste-bin ${category.color} text-white text-center p-6 rounded-xl mb-4`;
+                bin.innerHTML = `
+                    <div class="text-4xl mb-2">${category.emoji}</div>
+                    <div class="text-xl font-bold">${category.name}</div>
+                `;
+                bin.addEventListener('touchend', () => handleSort(key));
+                binsContainer.appendChild(bin);
             });
 
-            selectSet(currentSet);
+            generateNewItem();
         }
 
-        // Инициализация при загрузке
+        function generateNewItem() {
+            const categories = Object.keys(WASTE_CATEGORIES);
+            const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+            const categoryItems = WASTE_CATEGORIES[randomCategory].items;
+            const randomItem = categoryItems[Math.floor(Math.random() * categoryItems.length)];
+            
+            currentWasteItem = {
+                ...randomItem,
+                type: randomCategory
+            };
+
+            const itemContainer = document.getElementById('current-item');
+            itemContainer.innerHTML = `
+                <div class="bg-white p-8 rounded-xl shadow-md inline-block">
+                    <div class="text-6xl mb-4">${currentWasteItem.emoji}</div>
+                    <div class="text-xl font-bold">${currentWasteItem.name}</div>
+                </div>
+            `;
+        }
+
+        function handleSort(binType) {
+            if (!currentWasteItem) return;
+
+            if (currentWasteItem.type === binType) {
+                const pointsEarned = currentWasteItem.points + Math.floor(combo / 3);
+                score += pointsEarned;
+                combo++;
+                showFeedback(`+${pointsEarned} очков!`, 'success');
+            } else {
+                combo = 0;
+                showFeedback(
+                    `Неправильно! Это ${WASTE_CATEGORIES[currentWasteItem.type].name.toLowerCase()}`,
+                    'error'
+                );
+            }
+
+            document.getElementById('score').textContent = score;
+            document.getElementById('combo').textContent = `${combo}x`;
+
+            setTimeout(generateNewItem, 1500);
+        }
+
+        // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', () => {
-            initDecompositionGame();
+            // Запрос полноэкранного режима при первом касании
+            document.addEventListener('touchstart', function enableFullscreen() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                }
+                document.removeEventListener('touchstart', enableFullscreen);
+            }, { once: true });
+
+            // Инициализация кнопок
+            document.getElementById('start-decomposition').addEventListener('touchend', () => {
+                showScreen('decomposition');
+                initDecompositionGame();
+            });
+
+            document.getElementById('start-sorting').addEventListener('touchend', () => {
+                showScreen('waste-sorting');
+                initWasteSortingGame();
+            });
+
+            // Обработчики для кнопок "Назад в меню"
+            document.querySelectorAll('.back-to-menu').forEach(button => {
+                button.addEventListener('touchend', backToMenu);
+            });
+
+            // Предотвращение скролла страницы при перетаскивании
+            document.addEventListener('touchmove', (e) => {
+                if (document.querySelector('.dragging')) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
         });
     </script>
 </body>
