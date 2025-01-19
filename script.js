@@ -303,11 +303,34 @@ function endGame(message) {
         <div class="game-over">
             <h2>${message}</h2>
             <p>Ваш счёт: ${gameState.score}</p>
-            <button class="btn btn-start" onclick="location.reload()">Играть снова</button>
+            <button class="btn btn-start" onclick="restartGame()">Играть снова</button>
         </div>
     `;
+
+    // Добавляем класс для отключения справочника
+    document.getElementById('dictionary').classList.add('game-over-active');
 }
 
+function restartGame() {
+    // Очищаем таймер, если он есть
+    if (gameState.timer) {
+        clearInterval(gameState.timer);
+    }
+    
+    // Убираем класс отключения справочника
+    document.getElementById('dictionary').classList.remove('game-over-active');
+    
+    // Сбрасываем состояние игры
+    resetGame();
+    
+    // Запускаем таймер заново для режима на время
+    if (gameState.mode === 'time') {
+        startTimer();
+    }
+    
+    // Генерируем новый предмет
+    generateNewItem();
+}
 // Инициализация справочника
 function initializeDictionary() {
     const dictionaryContent = document.getElementById('dictionaryContent');

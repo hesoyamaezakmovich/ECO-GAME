@@ -39,12 +39,18 @@
                 </button>
             </div>
         </div>
-        
 
         <div id="gameContent" style="display: none;">
-            <h1 class="title">Эко-игра: Сортировка мусора</h1>
-            
-            
+            <div class="game-header">
+                <button class="btn-back" onclick="goBack()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Назад
+                </button>
+                <h1 class="title">Эко-игра: Сортировка мусора</h1>
+            </div>
 
             <div class="stats">
                 <div>Счёт: <span id="score">0</span></div>
@@ -118,6 +124,7 @@
                 <div id="dictionaryContent"></div>
             </div>
         </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
