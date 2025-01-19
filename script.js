@@ -78,34 +78,57 @@ let showTimes = false;
 let score = 0;
 let combo = 0;
 let currentWasteItem = null;
-let draggedElement = null;
 
-// Базовые функции
+// Функция переключения экранов
 function showScreen(screenId) {
-    console.log('Showing screen:', screenId); // Отладочный вывод
-    const screens = document.querySelectorAll('.game-container');
-    screens.forEach(screen => {
+    const screens = document.getElementsByClassName('game-container');
+    for (let screen of screens) {
         screen.style.display = 'none';
-    });
-    const targetScreen = document.getElementById(screenId);
-    if (targetScreen) {
-        targetScreen.style.display = 'block';
     }
+    document.getElementById(screenId).style.display = 'block';
 }
 
-function backToMenu() {
-    showScreen('menu');
+// Вспомогательные функции
+function shuffle(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
 }
 
-// Функции для игры "Время разложения"
+function showFeedback(message, type = 'success') {
+    const existingFeedback = document.querySelector('.feedback-popup');
+    if (existingFeedback) {
+        existingFeedback.remove();
+    }
+
+    const popup = document.createElement('div');
+    popup.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ' +
+                     'bg-white rounded-xl shadow-lg p-6 z-50 text-center feedback-popup';
+    popup.innerHTML = `
+        <div class="text-xl font-bold ${type === 'success' ? 'text-green-600' : 'text-red-600'}">
+            ${message}
+        </div>
+    `;
+    document.body.appendChild(popup);
+    setTimeout(() => popup.remove(), 1500);
+}
+
+// Функции для игры времени разложения
 function initDecompositionGame() {
-    console.log('Initializing decomposition game'); // Отладочный вывод
+    currentSet = 'set1';
+    currentItems = shuffle([...CARD_SETS[currentSet].items]);
+    showTimes = false;
+    renderItems();
+
     const setButtonsContainer = document.getElementById('set-buttons');
     setButtonsContainer.innerHTML = '';
     
     Object.entries(CARD_SETS).forEach(([key, set]) => {
         const button = document.createElement('button');
-        button.className = `set-btn ${currentSet === key ? 'bg-green-600 text-white' : 'bg-gray-200'}`;
+        button.className = `set-btn px-4 py-2 rounded-lg ${currentSet === key ? 'bg-green-600 text-white' : 'bg-gray-200'}`;
         button.textContent = set.name;
         button.addEventListener('click', (e) => {
             e.preventDefault();
@@ -113,8 +136,6 @@ function initDecompositionGame() {
         });
         setButtonsContainer.appendChild(button);
     });
-
-    selectSet(currentSet);
 }
 
 function selectSet(setKey) {
@@ -124,7 +145,7 @@ function selectSet(setKey) {
     renderItems();
 
     document.querySelectorAll('.set-btn').forEach(button => {
-        button.className = `set-btn ${
+        button.className = `set-btn px-4 py-2 rounded-lg ${
             button.textContent === CARD_SETS[setKey].name ? 'bg-green-600 text-white' : 'bg-gray-200'
         }`;
     });
@@ -154,25 +175,16 @@ function renderItems() {
     });
 }
 
-// Вспомогательные функции
-function shuffle(array) {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-}
-
 function setupDragListeners(card) {
     let startY = 0;
     let initialPosition = 0;
     
     card.addEventListener('touchstart', (e) => {
+        e.preventDefault();
         startY = e.touches[0].clientY;
         initialPosition = card.offsetTop;
         card.classList.add('dragging');
-    }, { passive: false });
+    });
 
     card.addEventListener('touchmove', (e) => {
         if (!card.classList.contains('dragging')) return;
@@ -203,7 +215,7 @@ function setupDragListeners(card) {
                 newCard.classList.add('dragging');
             }
         }
-    }, { passive: false });
+    });
 
     card.addEventListener('touchend', () => {
         card.classList.remove('dragging');
@@ -216,59 +228,172 @@ function setupDragListeners(card) {
     });
 }
 
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded'); // Отладочный вывод
-    
-    // Обработчики для основных кнопок меню
-    const decompositionButton = document.getElementById('start-decomposition');
-    const sortingButton = document.getElementById('start-sorting');
-    const backButtons = document.querySelectorAll('button[onclick="backToMenu()"]');
-    
-    if (decompositionButton) {
-        console.log('Adding decomposition button listener'); // Отладочный вывод
-        decompositionButton.onclick = (e) => {
-            e.preventDefault();
-            showScreen('decomposition');
-            initDecompositionGame();
-        };
-    }
-    
-    if (sortingButton) {
-        console.log('Adding sorting button listener'); // Отладочный вывод
-        sortingButton.onclick = (e) => {
-            e.preventDefault();
-            showScreen('waste-sorting');
-            initWasteSortingGame();
-        };
-    }
-    
-    backButtons.forEach(button => {
-        button.onclick = (e) => {
-            e.preventDefault();
-            backToMenu();
-        };
-    });
+function checkOrder() {
+    const isCorrect = currentItems.every((item, index) => item.correct === index + 1);
+    showTimes = true;
+    showFeedback(
+        isCorrect ? 'Правильно! Вы отлично справились!' : 'Попробуйте еще раз!',
+        isCorrect ? 'success' : 'error'
+    );
+    renderItems();
+}
 
-    // Инициализация полноэкранного режима
+function shuffleItems() {
+    currentItems = shuffle([...currentItems]);
+    showTimes = false;
+    renderItems();
+}
+
+// Функции для игры сортировки отходов
+function initWasteSortingGame() {
+    score = 0;
+    combo = 0;
+    document.getElementById('score').textContent = '0';
+    document.getElementById('combo').textContent = '0';
+    
+    const binsContainer = document.getElementById('waste-bins');
+    binsContainer.innerHTML = '';
+    
+    Object.entries(WASTE_CATEGORIES).forEach(([key, category]) => {
+        const bin = document.createElement('div');
+        bin.className = `waste-bin ${category.color} text-white`;
+        bin.innerHTML = `
+            <div class="text-4xl mb-2">${category.emoji}</div>
+            <div class="text-xl font-bold">${category.name}</div>
+        `;
+        bin.addEventListener('click', () => handleSort(key));
+        binsContainer.appendChild(bin);
+    });
+    
+    generateNewItem();
+}
+
+function generateNewItem() {
+    const categories = Object.keys(WASTE_CATEGORIES);
+    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+    const categoryItems = WASTE_CATEGORIES[randomCategory].items;
+    const randomItem = categoryItems[Math.floor(Math.random() * categoryItems.length)];
+    
+    currentWasteItem = {
+        ...randomItem,
+        type: randomCategory
+    };
+    
+    const itemContainer = document.getElementById('current-item');
+    itemContainer.innerHTML = `
+        <div class="bg-white p-8 rounded-xl shadow-md inline-block">
+            <div class="text-6xl mb-4">${currentWasteItem.emoji}</div>
+            <div class="text-xl font-bold">${currentWasteItem.name}</div>
+        </div>
+    `;
+}
+
+function handleSort(binType) {
+    if (!currentWasteItem) return;
+
+    if (currentWasteItem.type === binType) {
+        const pointsEarned = currentWasteItem.points + Math.floor(combo / 3);
+        score += pointsEarned;
+        combo++;
+        showFeedback(`+${pointsEarned} очков!`, 'success');
+    } else {
+        combo = 0;
+        showFeedback(
+            `Неправильно! Это ${WASTE_CATEGORIES[currentWasteItem.type].name.toLowerCase()}`,
+            'error'
+        );
+    }
+
+    document.getElementById('score').textContent = score;
+    document.getElementById('combo').textContent = `${combo}x`;
+
+    setTimeout(generateNewItem, 1500);
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    // Добавляем обработчик для кнопки полноэкранного режима
     const fullscreenButton = document.getElementById('fullscreen-button');
     if (fullscreenButton) {
-        fullscreenButton.onclick = async (e) => {
+        fullscreenButton.addEventListener('click', function(e) {
             e.preventDefault();
-            try {
-                if (!document.fullscreenElement) {
-                    await document.documentElement.requestFullscreen();
-                }
-            } catch (err) {
-                console.error('Error attempting to enable fullscreen:', err);
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Error attempting to enable fullscreen:', err);
+                });
             }
-        };
+        });
     }
 
-    // Предотвращение скролла при перетаскивании
+    // Предотвращаем скролл при перетаскивании
     document.addEventListener('touchmove', (e) => {
         if (document.querySelector('.dragging')) {
             e.preventDefault();
         }
     }, { passive: false });
-});
+
+    // Показываем начальный экран
+    showScreen('menu');
+}); //Добавляем обработчики для основных кнопок
+    const startDecomposition = document.getElementById('start-decomposition');
+    startDecomposition.addEventListener('click', function(e) {
+        e.preventDefault();
+        showScreen('decomposition');
+        initDecompositionGame();
+    });
+
+    const startSorting = document.getElementById('start-sorting');
+    startSorting.addEventListener('click', function(e) {
+        e.preventDefault();
+        showScreen('waste-sorting');
+        initWasteSortingGame();
+    });
+
+    // Добавляем обработчики для кнопок "Назад"
+    const backButtons = document.querySelectorAll('.back-to-menu');
+    backButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            showScreen('menu');
+        });
+    });
+
+    // Добавляем обработчики для кнопок проверки и перемешивания
+    const checkOrderButton = document.getElementById('check-order');
+    if (checkOrderButton) {
+        checkOrderButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            checkOrder();
+        });
+    }
+
+    const shuffleButton = document.getElementById('shuffle-items');
+    if (shuffleButton) {
+        shuffleButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            shuffleItems();
+        });
+    }
+
+    // Добавляем обработчик для кнопки полноэкранного режима
+    const fullscreenButton = document.getElementById('fullscreen-button');
+    if (fullscreenButton) {
+        fullscreenButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Error attempting to enable fullscreen:', err);
+                });
+            }
+        });
+    }
+
+    // Предотвращаем скролл при перетаскивании
+    document.addEventListener('touchmove', (e) => {
+        if (document.querySelector('.dragging')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // Показываем начальный экран
+    showScreen('menu');

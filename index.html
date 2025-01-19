@@ -26,4 +26,54 @@
                 </button>
                 <button id="start-sorting" class="w-full btn bg-blue-600 text-white text-left">
                     <div class="text-2xl mb-2">♻️ Сортировка мусора</div>
-                    <div class="text-sm opacity-90">Отсортируйте мусор по правиль
+                    <div class="text-sm opacity-90">Отсортируйте мусор по правильным контейнерам</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Игра "Время разложения" -->
+    <div id="decomposition" class="game-container">
+        <div class="game-header">
+            <div class="flex items-center justify-between mb-4">
+                <button class="btn bg-gray-600 text-white back-to-menu">
+                    ← Назад
+                </button>
+                <div class="flex gap-2">
+                    <button class="btn bg-green-600 text-white" id="check-order">
+                        Проверить
+                    </button>
+                    <button class="btn bg-blue-600 text-white" id="shuffle-items">
+                        Перемешать
+                    </button>
+                </div>
+            </div>
+            <div class="flex justify-center gap-2 overflow-x-auto py-2" id="set-buttons"></div>
+        </div>
+
+        <div class="pb-4 pt-32" id="items-container"></div>
+    </div>
+
+    <!-- Игра "Сортировка мусора" -->
+    <div id="waste-sorting" class="game-container">
+        <div class="game-header">
+            <div class="flex items-center justify-between mb-4">
+                <button class="btn bg-gray-600 text-white back-to-menu">
+                    ← Назад
+                </button>
+                <div class="flex items-center gap-4">
+                    <div class="text-xl font-bold">Очки: <span id="score">0</span></div>
+                    <div class="text-xl">×<span id="combo">0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-32 pb-4">
+            <div id="current-item" class="text-center mb-8"></div>
+            <div id="waste-bins" class="grid grid-cols-1 gap-4 max-w-lg mx-auto"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
