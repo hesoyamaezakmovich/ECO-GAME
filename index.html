@@ -33,42 +33,56 @@
         </div>
     </div>
 
-    <!-- Игра "Время разложения" -->
+<!-- Игра "Время разложения" -->
     <div id="decomposition" class="game-container">
         <div class="game-header">
-            <div class="flex items-center justify-between mb-4">
-                <button class="btn bg-gray-600 text-white back-to-menu">
-                    ← Назад
+            <div class="header-buttons">
+                <button class="back-btn back-to-menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Назад
                 </button>
-                <div class="flex gap-2">
-                    <button class="btn bg-green-600 text-white" id="check-order">
+                <div class="action-buttons">
+                    <button class="action-btn check" id="check-order">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
                         Проверить
                     </button>
-                    <button class="btn bg-blue-600 text-white" id="shuffle-items">
+                    <button class="action-btn shuffle" id="shuffle-items">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="16 3 21 3 21 8"/>
+                            <line x1="4" y1="20" x2="21" y2="3"/>
+                            <polyline points="21 16 21 21 16 21"/>
+                            <line x1="15" y1="15" x2="21" y2="21"/>
+                            <line x1="4" y1="4" x2="9" y2="9"/>
+                        </svg>
                         Перемешать
                     </button>
                 </div>
             </div>
-            <div class="flex justify-center gap-2 overflow-x-auto py-2" id="set-buttons"></div>
+            <div class="sets-nav" id="set-buttons"></div>
         </div>
-
         <div class="pb-4 pt-32" id="items-container"></div>
     </div>
 
-    <!-- Игра "Сортировка мусора" -->
+<!-- Игра "Сортировка мусора" -->
     <div id="waste-sorting" class="game-container">
         <div class="game-header">
-            <div class="flex items-center justify-between mb-4">
-                <button class="btn bg-gray-600 text-white back-to-menu">
-                    ← Назад
+            <div class="header-buttons">
+                <button class="back-btn back-to-menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Назад
                 </button>
                 <div class="flex items-center gap-4">
-                    <div class="text-xl font-bold">Очки: <span id="score">0</span></div>
-                    <div class="text-xl">×<span id="combo">0</span></div>
+                    <div class="score-display">Очки: <span id="score">0</span></div>
+                    <div class="combo-display">×<span id="combo">0</span></div>
                 </div>
             </div>
         </div>
-
         <div class="pt-32 pb-4">
             <div id="current-item" class="text-center mb-8"></div>
             <div id="waste-bins" class="grid grid-cols-1 gap-4 max-w-lg mx-auto"></div>
