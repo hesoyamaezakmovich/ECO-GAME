@@ -1,203 +1,50 @@
-/* Base styles */
-* {
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    user-select: none;
+.main-menu {
+    padding: 32px 16px;
 }
 
+.main-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #000;
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.game-button {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.game-emoji {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.game-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.game-description {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Базовые стили для корректной работы */
 body {
     margin: 0;
     padding: 0;
-    background-color: #f8fafc;
+    background: #f8fafc;
     min-height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Layout */
 .game-container {
     display: none;
-    min-height: 100vh;
-    position: relative;
-    padding-bottom: 80px; /* Space for bottom panel */
-}
-
-/* Header */
-.game-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-    background: #fff;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 12px;
-}
-
-.header-nav {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.back-button {
-    background: #f3f4f6;
-    color: #374151;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.back-button:active {
-    background: #e5e7eb;
-}
-
-/* Sets Navigation */
-.sets-nav {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding: 4px 0;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-.sets-nav::-webkit-scrollbar {
-    display: none;
-}
-
-.set-button {
-    background: #f3f4f6;
-    color: #374151;
-    border: none;
-    padding: 6px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.set-button.active {
-    background: #10b981;
-    color: #fff;
-}
-
-/* Bottom Action Panel */
-.action-panel {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #fff;
-    border-top: 1px solid #e5e7eb;
-    padding: 12px;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-}
-
-.action-button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    border: none;
-}
-
-.action-button.check {
-    background: #10b981;
-    color: #fff;
-}
-
-.action-button.shuffle {
-    background: #3b82f6;
-    color: #fff;
-}
-
-/* Cards Container */
-.cards-container {
-    padding: 76px 16px 0;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-/* Item Card */
-.item-card {
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-}
-
-.item-card.dragging {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.item-emoji {
-    font-size: 24px;
-    margin-right: 12px;
-    flex-shrink: 0;
-}
-
-.item-name {
-    flex-grow: 1;
-    font-size: 16px;
-    font-weight: 500;
-}
-
-.item-handle {
-    color: #9ca3af;
-    cursor: grab;
-    padding: 0 4px;
-}
-
-/* Main Menu */
-.menu-container {
-    padding: 24px;
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-.menu-title {
-    color: #10b981;
-    font-size: 32px;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 24px;
-}
-
-.menu-button {
-    width: 100%;
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    text-align: left;
-}
-
-.menu-button-emoji {
-    font-size: 24px;
-    margin-bottom: 8px;
-}
-
-.menu-button-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-
-.menu-button-desc {
-    font-size: 14px;
-    color: #6b7280;
 }
