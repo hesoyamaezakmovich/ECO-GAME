@@ -233,8 +233,42 @@ body {
     max-height: 80vh;
     overflow-y: auto;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    position: relative; /* Добавлено для позиционирования кнопки */
 }
 
+.btn-close-dict {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+    transition: all 0.2s ease;
+    padding: 0;
+    z-index: 10;
+}
+
+.btn-close-dict:hover {
+    background: #e5e7eb;
+    color: #1f2937;
+}
+
+.btn-close-dict svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Добавляем отступ для заголовка, чтобы он не перекрывался с кнопкой */
+.dictionary-content h2 {
+    padding-right: 40px;
+}
 .dictionary-category {
     margin-bottom: 24px;
     padding: 15px;
