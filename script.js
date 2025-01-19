@@ -17,7 +17,7 @@ const wasteDatabase = {
             { id: 'plastic_bag', name: 'Пластиковый пакет', hint: 'LDPE пластик', icon: '🛍️' },
             { id: 'envelope', name: 'Конверт', hint: 'Бумажная продукция', icon: '✉️' },
             { id: 'beer_can', name: 'Пивная банка', hint: 'Алюминий подлежит переработке', icon: '🍺' },
-            { id: 'glass_bottle', name: 'Стеклянная бутылка', hint: 'Стеклянная тара', icon: '🫙' },
+            { id: 'glass_bottle', name: 'Стеклянная бутылка', hint: 'Стеклянная тара', icon: '🍾' },
             { id: 'plastic_toys', name: 'Пластиковые игрушки', hint: 'Твердый пластик', icon: '🎲' },
             { id: 'metal_caps', name: 'Металлические крышки', hint: 'Металл для переработки', icon: '⭕' },
             { id: 'paper_bag', name: 'Бумажный пакет', hint: 'Крафт-бумага', icon: '🛍️' },
@@ -30,7 +30,7 @@ const wasteDatabase = {
         items: [
             { id: 'banana_peel', name: 'Банановая кожура', hint: 'Природное удобрение', icon: '🍌' },
             { id: 'apple_core', name: 'Яблочный огрызок', hint: 'Компостируемые остатки еды', icon: '🍎' },
-            { id: 'tea_bags', name: 'Чайные пакетики', hint: 'Натуральные материалы', icon: '🫖' },
+            { id: 'tea_bags', name: 'Чайные пакетики', hint: 'Натуральные материалы', icon: '🍵' },
             { id: 'coffee_grounds', name: 'Кофейная гуща', hint: 'Отличное удобрение', icon: '☕' },
             { id: 'egg_shells', name: 'Яичная скорлупа', hint: 'Источник кальция для компоста', icon: '🥚' },
             { id: 'vegetable_peels', name: 'Овощные очистки', hint: 'Идеально для компоста', icon: '🥕' },
@@ -66,10 +66,10 @@ const wasteDatabase = {
             { id: 'nail_polish', name: 'Лак для ногтей', hint: 'Химические растворители', icon: '💅' },
             { id: 'cleaning_products', name: 'Чистящие средства', hint: 'Агрессивная химия', icon: '🧪' },
             { id: 'car_battery', name: 'Автомобильный аккумулятор', hint: 'Содержит свинец и кислоту', icon: '🚗' },
-            { id: 'aerosol_cans', name: 'Аэрозольные баллончики', hint: 'Под давлением', icon: '🛁' },
+            { id: 'aerosol_cans', name: 'Аэрозольные баллончики', hint: 'Под давлением', icon: '⛫💨' },
             { id: 'laptop_battery', name: 'Батарея ноутбука', hint: 'Литий-ионный аккумулятор', icon: '💻' },
             { id: 'fertilizers', name: 'Удобрения', hint: 'Химические вещества', icon: '🌱' },
-            { id: 'glue', name: 'Клей', hint: 'Химические растворители', icon: '📎' },
+            { id: 'glue', name: 'Клей', hint: 'Химические растворители', icon: '🗞️' },
             { id: 'hair_dye', name: 'Краска для волос', hint: 'Химические красители', icon: '💇' },
             { id: 'varnish', name: 'Лак', hint: 'Токсичные испарения', icon: '🖌️' },
             { id: 'bleach', name: 'Отбеливатель', hint: 'Агрессивное химическое вещество', icon: '🧴' }
@@ -86,7 +86,12 @@ let gameState = {
     currentItem: null,
     timer: null,
     timeLeft: 0,
-    isGameOver: false
+    isGameOver: false,
+    isProcessing: false,
+    mistakesCount: 0,
+    comboMultiplier: 1,
+    lastCorrectBin: null,
+    penaltyTimeout: null
 };
 
 // Функция начала игры
@@ -130,6 +135,13 @@ function resetGame() {
     gameState.itemsSorted = 0;
     gameState.currentItem = null;
     gameState.isGameOver = false;
+    gameState.isProcessing = false;
+    gameState.mistakesCount = 0;
+    gameState.comboMultiplier = 1;
+    gameState.lastCorrectBin = null;
+    if (gameState.penaltyTimeout) {
+        clearTimeout(gameState.penaltyTimeout);
+    }
     updateStats();
 }
 
@@ -166,17 +178,38 @@ function showHint() {
 
 // Обработка броска предмета в контейнер
 function handleDrop(binType) {
-    if (!gameState.currentItem || gameState.isGameOver) return;
+    if (!gameState.currentItem || 
+        gameState.isGameOver || 
+        gameState.isProcessing) return;
+
+    gameState.isProcessing = true;
 
     gameState.itemsSorted++;
     const isCorrect = gameState.currentItem.type === binType;
 
     if (isCorrect) {
-        gameState.score++;
+        if (gameState.lastCorrectBin === binType) {
+            gameState.comboMultiplier = Math.max(0.5, gameState.comboMultiplier - 0.2);
+        } else {
+            gameState.comboMultiplier = Math.min(3, gameState.comboMultiplier + 0.5);
+        }
+        
+        const pointsEarned = Math.ceil(gameState.comboMultiplier);
+        gameState.score += pointsEarned;
         gameState.perfectStreak++;
-        showFeedback('Правильно! +1 очко', true);
+        gameState.lastCorrectBin = binType;
+        
+        showFeedback(`Правильно! +${pointsEarned} ${getComboMessage(gameState.comboMultiplier)}`, true);
     } else {
+        gameState.mistakesCount++;
         gameState.perfectStreak = 0;
+        gameState.comboMultiplier = 1;
+        gameState.lastCorrectBin = null;
+
+        if (gameState.mistakesCount >= 3) {
+            applyPenalty();
+        }
+
         showFeedback('Неправильно! Попробуйте еще раз', false);
 
         if (gameState.mode === 'survival') {
@@ -186,7 +219,55 @@ function handleDrop(binType) {
     }
 
     updateStats();
-    setTimeout(generateNewItem, 1500);
+
+    setTimeout(() => {
+        gameState.isProcessing = false;
+        generateNewItem();
+    }, 1500);
+}
+
+function goBack() {
+    // Очищаем все таймеры и состояния
+    if (gameState.timer) {
+        clearInterval(gameState.timer);
+    }
+    if (gameState.penaltyTimeout) {
+        clearTimeout(gameState.penaltyTimeout);
+    }
+    
+    // Скрываем игровой контент и показываем приветственный экран
+    document.getElementById('gameContent').style.display = 'none';
+    document.getElementById('welcome').style.display = 'block';
+    
+    // Удаляем таймер, если он был добавлен
+    const timerElement = document.getElementById('timer');
+    if (timerElement) {
+        timerElement.remove();
+    }
+    
+    // Сбрасываем состояние игры
+    resetGame();
+}
+
+// Функция для применения штрафа
+function applyPenalty() {
+    const penaltyTime = 5000; // 5 секунд
+    gameState.isProcessing = true;
+    
+    showFeedback('Слишком много ошибок! Штраф 5 секунд', false);
+    
+    gameState.penaltyTimeout = setTimeout(() => {
+        gameState.isProcessing = false;
+        gameState.mistakesCount = 0;
+    }, penaltyTime);
+}
+
+// Функция для получения сообщения о комбо
+function getComboMessage(multiplier) {
+    if (multiplier >= 3) return '🔥 СУПЕР КОМБО!';
+    if (multiplier >= 2) return '⭐ КОМБО!';
+    if (multiplier <= 0.5) return '⚠️ Используйте разные контейнеры!';
+    return '';
 }
 
 // Показать сообщение об успехе/неудаче
@@ -201,6 +282,10 @@ function updateStats() {
     document.getElementById('score').textContent = gameState.score;
     document.getElementById('streak').textContent = gameState.perfectStreak;
     document.getElementById('sorted').textContent = gameState.itemsSorted;
+    
+    const multiplierDisplay = gameState.comboMultiplier > 1 ? 
+        ` (x${gameState.comboMultiplier.toFixed(1)})` : '';
+    document.getElementById('score').textContent += multiplierDisplay;
 }
 
 // Завершение игры
@@ -208,6 +293,9 @@ function endGame(message) {
     gameState.isGameOver = true;
     if (gameState.timer) {
         clearInterval(gameState.timer);
+    }
+    if (gameState.penaltyTimeout) {
+        clearTimeout(gameState.penaltyTimeout);
     }
 
     const currentItem = document.getElementById('currentItem');
