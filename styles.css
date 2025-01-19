@@ -1,3 +1,16 @@
+/* Принудительная горизонтальная ориентация */
+@media screen and (orientation: portrait) {
+    html {
+        transform: rotate(-90deg);
+        transform-origin: left top;
+        width: 100vh;
+        height: 100vw;
+        position: absolute;
+        top: 100%;
+        left: 0;
+    }
+}
+
 * {
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
@@ -29,7 +42,7 @@ html, body {
     display: block;
 }
 
-/* Улучшенные стили для заголовка */
+/* Компактный заголовок */
 .game-header {
     position: fixed;
     top: 0;
@@ -39,117 +52,113 @@ html, body {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    padding: calc(env(safe-area-inset-top) + 16px) 16px 16px 16px;
+    padding: 8px 16px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* Улучшенные стили для карточек */
+/* Уменьшенные карточки */
 .item-card {
     background: white;
-    border-radius: 20px;
-    margin: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+    margin: 8px 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     transform: translateZ(0);
     will-change: transform;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid rgba(0, 0, 0, 0.05);
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .item-card.dragging {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
     transform: scale(1.02) translateZ(0);
 }
 
+/* Компактное содержимое карточки */
 .item-card .flex {
-    padding: 20px;
+    padding: 12px 16px;
+    gap: 12px;
 }
 
-/* Улучшенные стили для emoji */
+/* Уменьшенные emoji */
 .text-4xl {
-    font-size: 2.5rem;
-    line-height: 1;
+    font-size: 1.75rem;
 }
 
-/* Улучшенные стили для кнопок */
+/* Компактные кнопки */
 .btn {
-    padding: 14px 24px;
-    border-radius: 16px;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-.btn:active {
-    transform: scale(0.97);
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
-}
-
-/* Улучшенные стили для набора кнопок */
-.set-btn {
-    padding: 10px 20px;
-    border-radius: 12px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    background: white;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.set-btn:not(.bg-green-600) {
-    color: #4b5563;
-}
-
-/* Улучшенные стили для мусорных баков */
-.waste-bin {
-    background: white;
-    border-radius: 20px;
-    padding: 28px;
-    margin: 16px;
-    text-align: center;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.waste-bin:active {
-    transform: scale(0.98);
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
-}
-
-/* Стили для текущего предмета */
-#current-item .bg-white {
-    border-radius: 24px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    transform: translateY(0);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-#current-item .bg-white:active {
-    transform: translateY(2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-/* Стили для индикатора очков */
-.text-xl.font-bold {
-    background: rgba(0, 0, 0, 0.05);
     padding: 8px 16px;
     border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
 }
 
-/* Анимации для обратной связи */
+/* Набор кнопок */
+.set-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Мусорные баки */
+.waste-bin {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin: 8px;
+    text-align: center;
+}
+
+/* Компактный текущий предмет */
+#current-item .bg-white {
+    padding: 16px !important;
+    border-radius: 16px;
+}
+
+/* Компактные очки */
+.text-xl.font-bold {
+    font-size: 1rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+
+/* Стили для меню */
+.max-w-lg {
+    max-width: 32rem;
+    padding: 0 16px;
+}
+
+/* Уменьшаем размер заголовка в меню */
+h1.text-3xl {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Компактные кнопки в меню */
+#menu .btn {
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+#menu .text-2xl {
+    font-size: 1.25rem;
+}
+
+#menu .text-sm {
+    font-size: 0.75rem;
+}
+
+/* Отступы для контейнера с карточками */
+#items-container {
+    padding-top: 80px !important;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Feedback попап */
 .feedback-popup {
-    animation: popup 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes popup {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, -40%);
-    }
-    100% {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-    }
+    font-size: 0.875rem;
+    padding: 12px 24px !important;
 }
