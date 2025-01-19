@@ -12,7 +12,8 @@ html, body {
     height: 100%;
     overflow: hidden;
     position: fixed;
-    background-color: #f0f2f5;
+    background-color: #f8fafc;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .game-container {
@@ -21,116 +22,134 @@ html, body {
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
+    padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom) 16px;
 }
 
 #menu {
     display: block;
 }
 
+/* Улучшенные стили для заголовка */
 .game-header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 100;
-    background: white;
-    padding: env(safe-area-inset-top) 16px 16px 16px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: calc(env(safe-area-inset-top) + 16px) 16px 16px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
+/* Улучшенные стили для карточек */
 .item-card {
     background: white;
-    border-radius: 16px;
-    margin: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    margin: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transform: translateZ(0);
     will-change: transform;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .item-card.dragging {
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     transform: scale(1.02) translateZ(0);
 }
 
-.card-content {
+.item-card .flex {
     padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 100px;
 }
 
-.item-emoji {
-    font-size: 40px;
-    margin-right: 16px;
+/* Улучшенные стили для emoji */
+.text-4xl {
+    font-size: 2.5rem;
+    line-height: 1;
 }
 
-.item-info {
-    flex: 1;
-}
-
-.item-name {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 4px;
-}
-
-.decomp-time {
-    color: #16a34a;
-    font-size: 14px;
-}
-
-.drag-handle {
-    color: #9ca3af;
-    font-size: 24px;
-    padding: 0 12px;
-}
-
+/* Улучшенные стили для кнопок */
 .btn {
-    padding: 12px 24px;
-    border-radius: 12px;
+    padding: 14px 24px;
+    border-radius: 16px;
     font-weight: 600;
     font-size: 16px;
-    transition: transform 0.1s ease;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
-    cursor: pointer;
-    user-select: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .btn:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
 }
 
-/* Отключаем стандартные стили для активных состояний */
-.btn:focus {
-    outline: none;
-}
-
-.btn::-moz-focus-inner {
-    border: 0;
-}
-
+/* Улучшенные стили для набора кнопок */
 .set-btn {
-    padding: 8px 16px;
-    border-radius: 8px;
+    padding: 10px 20px;
+    border-radius: 12px;
     font-weight: 500;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+.set-btn:not(.bg-green-600) {
+    color: #4b5563;
+}
+
+/* Улучшенные стили для мусорных баков */
 .waste-bin {
     background: white;
-    border-radius: 16px;
-    padding: 24px;
-    margin: 12px;
+    border-radius: 20px;
+    padding: 28px;
+    margin: 16px;
     text-align: center;
-    transition: transform 0.1s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .waste-bin:active {
     transform: scale(0.98);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Стили для текущего предмета */
+#current-item .bg-white {
+    border-radius: 24px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(0);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#current-item .bg-white:active {
+    transform: translateY(2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Стили для индикатора очков */
+.text-xl.font-bold {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 8px 16px;
+    border-radius: 12px;
+}
+
+/* Анимации для обратной связи */
+.feedback-popup {
+    animation: popup 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes popup {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
 }
