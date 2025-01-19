@@ -346,7 +346,7 @@ function initializeDictionary() {
                 <div class="dictionary-item">
                     <span style="font-size: 1.5em; margin-right: 10px;">${item.icon}</span>
                     <span>${item.name}</span>
-                    <span class="hint">- ${item.hint}</span>
+                    <span class="hint">${item.hint}</span>
                 </div>
             `).join('')}
         `;
