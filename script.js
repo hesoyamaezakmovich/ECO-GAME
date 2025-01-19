@@ -1,22 +1,3 @@
-// Определение типа устройства
-function isMobile() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-}
-
-// Применение стилей в зависимости от устройства
-function applyDeviceSpecificStyles() {
-    const root = document.documentElement;
-    if (isMobile()) {
-        document.body.classList.add('mobile');
-    } else {
-        document.body.classList.add('desktop');
-    }
-}
-
-// Вызов функции при загрузке страницы и при изменении размера окна
-window.addEventListener('load', applyDeviceSpecificStyles);
-window.addEventListener('resize', applyDeviceSpecificStyles);
-
 // База данных отходов
 const wasteDatabase = {
     recycling: {
@@ -57,34 +38,65 @@ const wasteDatabase = {
 
 // Состояние игры
 let gameState = {
+    mode: 'classic',
     score: 0,
     perfectStreak: 0,
     itemsSorted: 0,
-    currentItem: null
+    currentItem: null,
+    timer: null,
+    timeLeft: 0,
+    isGameOver: false
 };
 
 // Функция начала игры
-function startGame() {
+function startGame(mode) {
+    gameState.mode = mode;
     document.getElementById('welcome').style.display = 'none';
     document.getElementById('gameContent').style.display = 'block';
+    
+    // Добавляем таймер для режима на время
+    if (mode === 'time') {
+        const statsDiv = document.querySelector('.stats');
+        const timerDiv = document.createElement('div');
+        timerDiv.className = 'timer';
+        timerDiv.id = 'timer';
+        timerDiv.textContent = '60';
+        statsDiv.insertBefore(timerDiv, statsDiv.firstChild);
+        startTimer();
+    }
+
     resetGame();
     generateNewItem();
     initializeDictionary();
 }
 
+// Запуск таймера для режима на время
+function startTimer() {
+    gameState.timeLeft = 60;
+    gameState.timer = setInterval(() => {
+        gameState.timeLeft--;
+        document.getElementById('timer').textContent = gameState.timeLeft;
+        
+        if (gameState.timeLeft <= 0) {
+            endGame('Время вышло!');
+        }
+    }, 1000);
+}
+
 // Сброс игры
 function resetGame() {
-    gameState = {
-        score: 0,
-        perfectStreak: 0,
-        itemsSorted: 0,
-        currentItem: null
-    };
+    gameState.score = 0;
+    gameState.perfectStreak = 0;
+    gameState.itemsSorted = 0;
+    gameState.currentItem = null;
+    gameState.isGameOver = false;
     updateStats();
 }
 
 // Генерация нового предмета
 function generateNewItem() {
+    if (gameState.isGameOver) return;
+
     const categories = Object.keys(wasteDatabase);
     const randomCategory = categories[Math.floor(Math.random() * categories.length)];
     const categoryItems = wasteDatabase[randomCategory].items;
@@ -103,6 +115,8 @@ function generateNewItem() {
 
 // Показать подсказку
 function showHint() {
+    if (gameState.isGameOver) return;
+    
     const hintElement = document.getElementById('itemHint');
     hintElement.textContent = gameState.currentItem.hint;
     hintElement.style.display = 'block';
@@ -110,17 +124,23 @@ function showHint() {
 
 // Обработка броска предмета в контейнер
 function handleDrop(binType) {
-    if (!gameState.currentItem) return;
+    if (!gameState.currentItem || gameState.isGameOver) return;
 
     gameState.itemsSorted++;
+    const isCorrect = gameState.currentItem.type === binType;
 
-    if (gameState.currentItem.type === binType) {
+    if (isCorrect) {
         gameState.score++;
         gameState.perfectStreak++;
         showFeedback('Правильно! +1 очко', true);
     } else {
         gameState.perfectStreak = 0;
         showFeedback('Неправильно! Попробуйте еще раз', false);
+
+        if (gameState.mode === 'survival') {
+            endGame('Игра окончена! Неправильная сортировка.');
+            return;
+        }
     }
 
     updateStats();
@@ -139,6 +159,23 @@ function updateStats() {
     document.getElementById('score').textContent = gameState.score;
     document.getElementById('streak').textContent = gameState.perfectStreak;
     document.getElementById('sorted').textContent = gameState.itemsSorted;
+}
+
+// Завершение игры
+function endGame(message) {
+    gameState.isGameOver = true;
+    if (gameState.timer) {
+        clearInterval(gameState.timer);
+    }
+
+    const currentItem = document.getElementById('currentItem');
+    currentItem.innerHTML = `
+        <div class="game-over">
+            <h2>${message}</h2>
+            <p>Ваш счёт: ${gameState.score}</p>
+            <button class="btn btn-start" onclick="location.reload()">Играть снова</button>
+        </div>
+    `;
 }
 
 // Инициализация справочника
@@ -169,6 +206,7 @@ function initializeDictionary() {
 
 // Переключение видимости справочника
 function toggleDictionary() {
+    if (gameState.isGameOver) return;
     const dictionary = document.getElementById('dictionary');
     dictionary.classList.toggle('active');
 }

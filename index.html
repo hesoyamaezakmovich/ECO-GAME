@@ -11,10 +11,22 @@
         <div id="welcome" class="welcome">
             <h1 class="title">Эко-игра: Сортировка мусора</h1>
             <p>
-                Научитесь правильно сортировать мусор! Выберите правильный контейнер для каждого предмета.
-                Используйте подсказки и справочник, чтобы узнать больше о правильной сортировке.
+                Научитесь правильно сортировать мусор! Выберите режим игры и начните сортировать отходы.
             </p>
-            <button class="btn btn-start" onclick="startGame()">Начать игру</button>
+            <div class="game-modes">
+                <button class="btn btn-mode" onclick="startGame('classic')">
+                    <span class="mode-title">Классический</span>
+                    <span class="mode-desc">Играйте в своем темпе, без ограничений</span>
+                </button>
+                <button class="btn btn-mode" onclick="startGame('time')">
+                    <span class="mode-title">На время</span>
+                    <span class="mode-desc">У вас есть 60 секунд</span>
+                </button>
+                <button class="btn btn-mode" onclick="startGame('survival')">
+                    <span class="mode-title">Выживание</span>
+                    <span class="mode-desc">Игра до первой ошибки</span>
+                </button>
+            </div>
         </div>
 
         <div id="gameContent" style="display: none;">
