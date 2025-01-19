@@ -249,31 +249,62 @@ function handleSort(binType) {
     setTimeout(generateNewItem, 1500);
 }
 
+// Обработчик для всех кнопок
+function handleButtonClick(event) {
+    event.preventDefault(); // Предотвращаем стандартное поведение
+    const button = event.currentTarget;
+    
+    // Определяем действие в зависимости от кнопки
+    switch(button.id) {
+        case 'start-decomposition':
+            showScreen('decomposition');
+            initDecompositionGame();
+            break;
+        case 'start-sorting':
+            showScreen('waste-sorting');
+            initWasteSortingGame();
+            break;
+        case 'fullscreen-button':
+            toggleFullScreen();
+            break;
+    }
+
+    // Если у кнопки есть onclick атрибут, вызываем соответствующую функцию
+    const onclickAttr = button.getAttribute('onclick');
+    if (onclickAttr) {
+        const functionName = onclickAttr.replace('()', '');
+        if (typeof window[functionName] === 'function') {
+            window[functionName]();
+        }
+    }
+}
+
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
-    // Запрос полноэкранного режима при первом касании
-    document.addEventListener('touchstart', function enableFullscreen() {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-        }
-        document.removeEventListener('touchstart', enableFullscreen);
-    }, { once: true });
-
-    // Инициализация кнопок
-    document.getElementById('start-decomposition').addEventListener('touchend', () => {
-        showScreen('decomposition');
-        initDecompositionGame();
+    // Добавляем обработчики для всех кнопок
+    const buttons = document.querySelectorAll('button, .btn');
+    buttons.forEach(button => {
+        // Удаляем старые обработчики
+        button.removeAttribute('onclick');
+        
+        // Добавляем новые обработчики для всех типов событий
+        ['touchstart', 'mousedown'].forEach(eventType => {
+            button.addEventListener(eventType, (e) => {
+                e.preventDefault();
+            });
+        });
+        
+        ['touchend', 'click'].forEach(eventType => {
+            button.addEventListener(eventType, handleButtonClick);
+        });
     });
 
-    document.getElementById('start-sorting').addEventListener('touchend', () => {
-        showScreen('waste-sorting');
-        initWasteSortingGame();
-    });
-
-    // Обработчики для кнопок "Назад в меню"
-    document.querySelectorAll('.back-to-menu').forEach(button => {
-        button.addEventListener('touchend', backToMenu);
-    });
+    // Добавляем обработчик для кнопки полноэкранного режима
+    const fullscreenButton = document.getElementById('fullscreen-button');
+    if (fullscreenButton) {
+        fullscreenButton.addEventListener('touchend', toggleFullScreen);
+        fullscreenButton.addEventListener('click', toggleFullScreen);
+    }
 
     // Предотвращение скролла страницы при перетаскивании
     document.addEventListener('touchmove', (e) => {
@@ -281,6 +312,23 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
         }
     }, { passive: false });
+
+    // Предотвращаем стандартное поведение для всех кнопок
+    document.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON' || e.target.classList.contains('btn')) {
+            e.preventDefault();
+        }
+    });
+
+    // Запрос полноэкранного режима при первом касании
+    document.addEventListener('touchstart', function enableFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.log('Error attempting to enable fullscreen:', err);
+            });
+        }
+        document.removeEventListener('touchstart', enableFullscreen);
+    }, { once: true });
 });;
 
 const WASTE_CATEGORIES = {
@@ -357,5 +405,3 @@ function shuffle(array) {
     for (let i = newArray.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-}    
