@@ -1,138 +1,197 @@
-/* Стили для кнопок управления */
-.control-buttons {
-    position: fixed;
-    bottom: 16px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    padding: 0 16px;
-    z-index: 10;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-.control-button {
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 500;
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f0f2f5;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.title {
+    color: #22c55e;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 8px 16px;
     border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 16px;
+    transition: opacity 0.2s;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn-start {
+    background-color: #22c55e;
+    padding: 12px 24px;
+    font-size: 18px;
+}
+
+.btn-hint {
+    background-color: #eab308;
+}
+
+.btn-dict {
+    background-color: #9333ea;
+}
+
+.btn-close {
+    background-color: #6b7280;
+    margin-top: 16px;
+}
+
+.current-item {
+    background-color: #f3f4f6;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.current-item svg {
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.feedback {
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.feedback.success {
+    color: #22c55e;
+}
+
+.feedback.error {
+    color: #ef4444;
+}
+
+.bins {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.bin {
+    padding: 24px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 150px;
+    border: none;
+}
+
+.bin svg {
+    width: 32px;
+    height: 32px;
+}
+
+.bin-recycling {
+    background-color: #3b82f6;
+}
+
+.bin-organic {
+    background-color: #22c55e;
+}
+
+.bin-hazardous {
+    background-color: #ef4444;
+}
+
+.dictionary {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+}
+
+.dictionary.active {
+    display: flex;
+}
+
+.dictionary-content {
+    background-color: white;
+    padding: 24px;
+    border-radius: 8px;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.dictionary-category {
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.dictionary-category h3 {
+    margin-bottom: 8px;
+}
+
+.dictionary-item {
     display: flex;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 8px;
 }
 
-.control-button svg {
-    width: 20px;
-    height: 20px;
-}
-
-.control-button.check {
-    background: #10b981;
-    color: white;
-}
-
-.control-button.shuffle {
-    background: #3b82f6;
-    color: white;
-}
-
-/* Улучшенная кнопка "Назад" */
-.back-button {
-    background: white;
-    border: 1px solid #e5e7eb;
-    padding: 8px 16px;
-    border-radius: 8px;
+.dictionary-item .hint {
+    color: #6b7280;
     font-size: 14px;
-    font-weight: 500;
-    color: #374151;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.back-button:active {
-    background: #f9fafb;
-}
-
-/* Улучшенные стили для карточек */
-.item-card {
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    margin-bottom: 12px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.item-card.dragging {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-color: #d1d5db;
-}
-
-.item-emoji {
-    font-size: 28px;
-    margin-right: 16px;
-    flex-shrink: 0;
-}
-
-.item-name {
-    flex-grow: 1;
-    font-size: 16px;
-    font-weight: 500;
-    color: #1f2937;
-}
-
-.item-handle {
-    color: #9ca3af;
-    padding: 4px;
-}
-
-/* Контейнер для карточек с отступом под кнопки */
-.cards-container {
-    padding: 16px 16px 80px 16px;
-    max-width: 600px;
+.welcome {
+    max-width: 500px;
     margin: 0 auto;
 }
 
-/* Улучшенные стили для кнопок наборов */
-.sets-nav {
-    display: flex;
-    gap: 8px;
-    padding: 4px 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+.welcome p {
+    margin-bottom: 20px;
 }
 
-.sets-nav::-webkit-scrollbar {
-    display: none;
-}
-
-.set-button {
-    padding: 6px 16px;
-    border-radius: 8px;
+.hint {
+    color: #6b7280;
     font-size: 14px;
-    font-weight: 500;
-    background: #f3f4f6;
-    color: #374151;
-    border: none;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-}
-
-.set-button.active {
-    background: #10b981;
-    color: white;
-}
-
-/* Анимации для интерактивных элементов */
-.control-button:active,
-.back-button:active,
-.set-button:active {
-    transform: scale(0.98);
+    margin-top: 8px;
 }

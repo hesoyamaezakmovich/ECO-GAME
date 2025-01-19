@@ -2,84 +2,93 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Эко-игры</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Эко-игра: Сортировка мусора</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<!-- Главное меню -->
-    <div id="menu" class="main-menu">
-        <h1 class="main-title">Эко-игры</h1>
-    
-        <button id="start-decomposition" class="game-button">
-            <div class="game-emoji">⌛️</div>
-            <div class="game-title">Время разложения</div>
-            <div class="game-description">Расположите предметы по времени их разложения</div>
-        </button>
-    
-        <button id="start-sorting" class="game-button">
-            <div class="game-emoji">♻️</div>
-            <div class="game-title">Сортировка мусора</div>
-            <div class="game-description">Отсортируйте мусор по правильным контейнерам</div>
-        </button>
-    </div>
-
-    <!-- Decomposition Game -->
-    <div class="game-header">
-        <div class="header-nav">
-            <button class="back-button back-to-menu">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5m7 7-7-7 7-7"/>
-                </svg>
-                Назад
-            </button>
-            <div class="sets-nav" id="set-buttons"></div>
+    <div class="container" id="game">
+        <div id="welcome" class="welcome">
+            <h1 class="title">Эко-игра: Сортировка мусора</h1>
+            <p>
+                Научитесь правильно сортировать мусор! Выберите правильный контейнер для каждого предмета.
+                Используйте подсказки и справочник, чтобы узнать больше о правильной сортировке.
+            </p>
+            <button class="btn btn-start" onclick="startGame()">Начать игру</button>
         </div>
-    </div>
-    
-    <!-- Контейнер для карточек -->
-    <div class="cards-container" id="items-container"></div>
-    
-    <!-- Кнопки управления внизу -->
-    <div class="control-buttons">
-        <button class="control-button check" id="check-order">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="20 6 9 17 4 12"/>
-            </svg>
-            Проверить
-        </button>
-        <button class="control-button shuffle" id="shuffle-items">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 16v5h-5M3 8h5v5"/>
-            </svg>
-            Перемешать
-        </button>
-    </div>
 
-    <!-- Waste Sorting Game -->
-    <div id="waste-sorting" class="game-container">
-        <div class="game-header">
-            <div class="header-nav">
-                <button class="back-button back-to-menu">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 12H5m7 7-7-7 7-7"/>
+        <div id="gameContent" style="display: none;">
+            <h1 class="title">Эко-игра: Сортировка мусора</h1>
+            
+            <div class="stats">
+                <p>Счёт: <span id="score">0</span></p>
+                <p>Серия: <span id="streak">0</span></p>
+                <p>Отсортировано: <span id="sorted">0</span></p>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-hint" onclick="showHint()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12" y2="17"></line>
                     </svg>
-                    Назад
+                    Подсказка
                 </button>
-                <div class="score-display">
-                    Очки: <span id="score">0</span>
-                    <span class="ml-4">×<span id="combo">0</span></span>
-                </div>
+                <button class="btn btn-dict" onclick="toggleDictionary()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    Справочник
+                </button>
+            </div>
+
+            <div id="currentItem" class="current-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                </svg>
+                <span id="itemName"></span>
+                <p id="itemHint" style="display: none;" class="hint"></p>
+            </div>
+
+            <p id="feedback" class="feedback"></p>
+
+            <div class="bins">
+                <button class="bin bin-recycling" onclick="handleDrop('recycling')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                    Переработка
+                </button>
+                <button class="bin bin-organic" onclick="handleDrop('organic')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Органика
+                </button>
+                <button class="bin bin-hazardous" onclick="handleDrop('hazardous')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="1" y="6" width="18" height="12" rx="2" ry="2"></rect>
+                        <line x1="23" y1="13" x2="23" y2="11"></line>
+                    </svg>
+                    Опасные отходы
+                </button>
             </div>
         </div>
 
-        <div class="cards-container">
-            <div id="current-item" class="text-center mb-8"></div>
-            <div id="waste-bins" class="space-y-4"></div>
+        <div id="dictionary" class="dictionary">
+            <div class="dictionary-content">
+                <h2>Справочник по сортировке отходов</h2>
+                <div id="dictionaryContent"></div>
+                <button class="btn btn-close" onclick="toggleDictionary()">
+                    Закрыть
+                </button>
+            </div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
