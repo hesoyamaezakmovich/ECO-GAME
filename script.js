@@ -355,7 +355,7 @@ function initializeDictionary() {
     });
 }
 
-// Переключение видимости справочника
+/// Переключение видимости справочника
 function toggleDictionary() {
     if (gameState.isGameOver) return;
     const dictionary = document.getElementById('dictionary');
