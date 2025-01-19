@@ -1,3 +1,22 @@
+// Определение типа устройства
+function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+}
+
+// Применение стилей в зависимости от устройства
+function applyDeviceSpecificStyles() {
+    const root = document.documentElement;
+    if (isMobile()) {
+        document.body.classList.add('mobile');
+    } else {
+        document.body.classList.add('desktop');
+    }
+}
+
+// Вызов функции при загрузке страницы и при изменении размера окна
+window.addEventListener('load', applyDeviceSpecificStyles);
+window.addEventListener('resize', applyDeviceSpecificStyles);
+
 // База данных отходов
 const wasteDatabase = {
     recycling: {
