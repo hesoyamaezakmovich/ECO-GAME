@@ -1,90 +1,112 @@
-/* Базовые стили */
-body {
-    margin: 0;
-    padding: 0;
-    background: #f8fafc;
-}
-
-/* Контейнеры экранов */
-.game-container {
-    display: none;
+/* Стили для кнопок управления */
+.control-buttons {
     position: fixed;
-    top: 0;
+    bottom: 16px;
     left: 0;
     right: 0;
-    bottom: 0;
-    background: #f8fafc;
-    overflow-y: auto;
-}
-
-#menu {
-    display: block;
-}
-
-/* Главное меню */
-.main-menu {
-    padding: 32px 16px;
-}
-
-.main-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #000;
-    text-align: center;
-    margin-bottom: 32px;
-}
-
-.game-button {
-    width: 100%;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
-    text-align: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.game-emoji {
-    font-size: 32px;
-    margin-bottom: 12px;
-}
-
-.game-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 8px;
-}
-
-.game-description {
-    font-size: 14px;
-    color: #666;
-}
-
-/* Игровой экран */
-.game-header {
-    position: sticky;
-    top: 0;
-    background: #fff;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 12px 16px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 0 16px;
     z-index: 10;
 }
 
-.header-nav {
+.control-button {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    border: none;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Наборы */
+.control-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.control-button.check {
+    background: #10b981;
+    color: white;
+}
+
+.control-button.shuffle {
+    background: #3b82f6;
+    color: white;
+}
+
+/* Улучшенная кнопка "Назад" */
+.back-button {
+    background: white;
+    border: 1px solid #e5e7eb;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.back-button:active {
+    background: #f9fafb;
+}
+
+/* Улучшенные стили для карточек */
+.item-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.item-card.dragging {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-color: #d1d5db;
+}
+
+.item-emoji {
+    font-size: 28px;
+    margin-right: 16px;
+    flex-shrink: 0;
+}
+
+.item-name {
+    flex-grow: 1;
+    font-size: 16px;
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.item-handle {
+    color: #9ca3af;
+    padding: 4px;
+}
+
+/* Контейнер для карточек с отступом под кнопки */
+.cards-container {
+    padding: 16px 16px 80px 16px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Улучшенные стили для кнопок наборов */
 .sets-nav {
     display: flex;
     gap: 8px;
     padding: 4px 0;
     overflow-x: auto;
-    -ms-overflow-style: none;
     scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .sets-nav::-webkit-scrollbar {
@@ -93,45 +115,24 @@ body {
 
 .set-button {
     padding: 6px 16px;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 14px;
+    font-weight: 500;
     background: #f3f4f6;
     color: #374151;
     border: none;
     white-space: nowrap;
+    transition: all 0.2s ease;
 }
 
 .set-button.active {
     background: #10b981;
-    color: #fff;
+    color: white;
 }
 
-/* Карточки предметов */
-.cards-container {
-    padding: 16px;
-}
-
-.item-card {
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    margin-bottom: 8px;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-}
-
-.item-emoji {
-    font-size: 24px;
-    margin-right: 12px;
-}
-
-.item-name {
-    flex-grow: 1;
-    font-size: 16px;
-}
-
-.item-handle {
-    color: #9ca3af;
-    padding: 0 4px;
+/* Анимации для интерактивных элементов */
+.control-button:active,
+.back-button:active,
+.set-button:active {
+    transform: scale(0.98);
 }
