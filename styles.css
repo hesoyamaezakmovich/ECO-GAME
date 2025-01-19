@@ -7,7 +7,7 @@
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
-    background-color: #f0f2f5;
+    background: linear-gradient(135deg, #f0f7f4 0%, #e8f3f1 100%);
     min-height: 100vh;
     width: 100%;
     overflow-x: hidden;
@@ -17,126 +17,156 @@ body {
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
-    padding: 10px;
+    padding: 15px;
     text-align: center;
 }
 
 .title {
     color: #22c55e;
-    font-size: 20px;
-    margin-bottom: 15px;
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: inline-block;
+}
+
+.title:after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #22c55e, transparent);
+    border-radius: 2px;
+}
+
+.game-container {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
 .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+}
+
+.stat-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 15px;
-    font-size: 14px;
+    padding: 10px;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #374151;
 }
 
 .controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 15px;
-    padding: 0 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
 .btn {
-    width: 100%;
-    max-width: 300px;
     padding: 12px;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     color: white;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 8px;
     font-size: 14px;
-    transition: opacity 0.2s;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.btn:hover {
-    opacity: 0.9;
+.btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn-start {
-    background-color: #22c55e;
-    font-size: 16px;
-    padding: 14px;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    grid-column: 1 / -1;
 }
 
 .btn-hint {
-    background-color: #eab308;
+    background: linear-gradient(135deg, #eab308 0%, #d97706 100%);
 }
 
 .btn-dict {
-    background-color: #9333ea;
-}
-
-.btn-close {
-    background-color: #6b7280;
-    margin-top: 16px;
+    background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
 }
 
 .current-item {
-    background-color: #f3f4f6;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: 0 10px 15px 10px;
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin: 20px 0;
+    transform: translateZ(0);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 12px;
 }
 
 .current-item svg {
-    width: 20px;
-    height: 20px;
-}
-
-.feedback {
-    margin: 10px 0;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.feedback.success {
-    color: #22c55e;
-}
-
-.feedback.error {
-    color: #ef4444;
+    width: 28px;
+    height: 28px;
+    color: #4b5563;
 }
 
 .bins {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    padding: 0 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
 }
 
 .bin {
-    width: 100%;
-    max-width: 300px;
     padding: 16px;
-    border-radius: 8px;
+    border-radius: 12px;
     color: white;
     cursor: pointer;
     display: flex;
-    flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
     border: none;
-    font-size: 14px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.bin:active {
+    transform: scale(0.98);
 }
 
 .bin svg {
@@ -145,25 +175,26 @@ body {
 }
 
 .bin-recycling {
-    background-color: #3b82f6;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
 }
 
 .bin-organic {
-    background-color: #22c55e;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
 }
 
 .bin-hazardous {
-    background-color: #ef4444;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 }
 
 .dictionary {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     display: none;
     justify-content: center;
     align-items: center;
-    padding: 10px;
+    padding: 20px;
+    backdrop-filter: blur(4px);
 }
 
 .dictionary.active {
@@ -171,110 +202,100 @@ body {
 }
 
 .dictionary-content {
-    background-color: white;
-    padding: 16px;
-    border-radius: 8px;
+    background: white;
+    padding: 24px;
+    border-radius: 20px;
     width: 90%;
-    max-width: 400px;
+    max-width: 500px;
     max-height: 80vh;
     overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 .dictionary-category {
-    margin-bottom: 20px;
-    text-align: left;
+    margin-bottom: 24px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
 }
 
 .dictionary-category h3 {
-    font-size: 16px;
-    margin-bottom: 8px;
+    font-size: 18px;
+    color: #1f2937;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e5e7eb;
 }
 
 .dictionary-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    padding: 8px;
     margin-bottom: 8px;
-    font-size: 14px;
+    background: white;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.dictionary-item:hover {
+    background: #f3f4f6;
 }
 
 .dictionary-item .hint {
     color: #6b7280;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .welcome {
-    padding: 0 10px;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 20px auto;
 }
 
 .welcome p {
-    margin-bottom: 20px;
-    font-size: 14px;
+    margin-bottom: 25px;
+    color: #4b5563;
+    font-size: 16px;
+    line-height: 1.6;
 }
 
 .hint {
-    color: #6b7280;
-    font-size: 12px;
-    margin-top: 8px;
+    background: #fffbeb;
+    color: #92400e;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border-left: 4px solid #f59e0b;
 }
 
-/* Стили для десктопов */
-@media screen and (min-width: 768px) {
+@media screen and (max-width: 768px) {
     .container {
-        padding: 20px;
-    }
-
-    .title {
-        font-size: 24px;
-        margin-bottom: 20px;
+        padding: 10px;
     }
 
     .stats {
-        flex-direction: row;
-        justify-content: center;
-        gap: 20px;
-        font-size: 16px;
+        grid-template-columns: 1fr;
     }
 
     .controls {
-        flex-direction: row;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    .btn {
-        width: auto;
-        padding: 8px 16px;
-    }
-
-    .current-item {
-        padding: 24px;
-        margin-bottom: 20px;
+        grid-template-columns: 1fr;
     }
 
     .bins {
-        flex-direction: row;
-        justify-content: center;
-        gap: 20px;
-    }
-
-    .bin {
-        flex-direction: column;
-        padding: 24px;
-        width: 150px;
+        grid-template-columns: 1fr;
     }
 
     .dictionary-content {
-        padding: 24px;
-        max-width: 600px;
+        padding: 16px;
     }
 
     .welcome {
-        max-width: 500px;
-        margin: 0 auto;
-    }
-
-    .welcome p {
-        font-size: 16px;
+        padding: 20px;
+        margin: 10px;
     }
 }
